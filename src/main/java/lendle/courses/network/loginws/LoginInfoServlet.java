@@ -106,14 +106,16 @@ public class LoginInfoServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
-        try (PrintWriter out=response.getWriter(); Connection conn=DriverManager.getConnection("jdbc:derby://localhost:1527/sample", "app", "app")) {
+        try (PrintWriter out=response.getWriter(); 
+                Connection conn=DriverManager
+                        .getConnection("jdbc:derby://localhost:1527/sample", "app", "app")) {
             //update the corresponding user
             Statement stmt =conn.createStatement();
             String id=request.getParameter("id");
             String password=request.getParameter("password");
             stmt.executeUpdate("update LOGIN set password='"+password+"'where id ='"+id+"'");
             //////////////////////////////
-            out.println("put success");
+            out.println("id: "+id+" password: "+password+"\n"+"put success");
         }catch(Exception e){
             throw new ServletException(e);
         }
@@ -138,12 +140,16 @@ public class LoginInfoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
-        try (PrintWriter out=response.getWriter(); Connection conn=DriverManager.getConnection("jdbc:derby://localhost:1527/sample", "app", "app")) {
+        try (PrintWriter out=response.getWriter(); Connection conn=DriverManager
+                .getConnection("jdbc:derby://localhost:1527/sample", "app", "app")) {
             //insert the corresponding user
-            Statement stmt =conn.createStatement();
+           
             String id=request.getParameter("id");
             String password=request.getParameter("password");
-            stmt.executeUpdate("insert into LOGIN (id,password) values('"+id+"','"+password+"')");
+            PreparedStatement stmt =conn.prepareStatement("insert into LOGIN (id,password) values(?,?)");
+            stmt.setString(1,id);
+            stmt.setString(2,password);
+            stmt.executeUpdate();
             out.print("post success");
             //////////////////////////////
             out.println("success");
